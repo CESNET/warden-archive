@@ -8,3 +8,5 @@ After=network.target
 User=wardenarchiver
 ExecStart=/usr/bin/python3 /data/warden_archive/warden_archiver.py /data/warden_archive/warden_client.cfg -d /data/warden_archive/archive/
 
+[Install]
+WantedBy=multi-user.target
