@@ -1,0 +1,6 @@
+/data/warden_archive/warden_archiver.log {
+  rotate 4
+  size 10M
+  copytruncate
+  su wardenarchiver wardenarchiver
+}

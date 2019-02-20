@@ -1,0 +1,10 @@
+# Systemd unit for Warden archiver
+
+[Unit]
+Description=Warden archiver
+After=network.target
+
+[Service]
+User=wardenarchiver
+ExecStart=/usr/bin/python3 /data/warden_archive/warden_archiver.py /data/warden_archive/warden_client.cfg -d /data/warden_archive/archive/
+

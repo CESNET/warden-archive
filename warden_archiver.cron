@@ -1,0 +1,2 @@
+# gzip old data in the warden archive every night (at 00:10)
+10 0 * * * wardenarchiver gzip /data/warden_archive/archive/????-??-??
