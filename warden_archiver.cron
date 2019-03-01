@@ -1,2 +1,3 @@
 # gzip old data in the warden archive every night (at 00:10)
-10 0 * * * wardenarchiver gzip /data/warden_archive/archive/????-??-??
+# TODO: maybe call directly by archiver?
+10 0 * * * wardenarchiver /data/warden_archive/process_daily_file.sh $(date -Idate -d "-1day") >>/data/warden_archive/processing.log 2>&1

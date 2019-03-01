@@ -4,19 +4,23 @@ Simple script to continuosly download all data from [Warden](https://warden.cesn
 
 It periodically downloads new messages from Warden and stores them to files
 in given directory. Each file contains messages recevied on a particular day,
-one message per line. The files are named by the date, `YYYY-DD-MM`, the file of
-the current day (which is still being filled) is named `YYYY-DD-MM.current` and
-is renamed as soon as new file is to be created (i.e. just after midnight).
+one message per line. The files are named by the date, `YYYY-DD-MM`, the file
+of the current day (which is still being filled) is named `YYYY-DD-MM.current`
+and is renamed as soon as new file is to be created (i.e. just after midnight).
 
 If the attached cron script is used, each finished file is automatically
-gzipped few minutes after midnight, so the `archive` directory contains gzipped
-files named `YYYY-DD-MM.gz` instead.
+processed by process_daily_file.sh script. By default, this script counts
+number of alerts received in the day and then compress the file using gzip.
+Thereore, in such setting, the `archive` directory contains gzipped files named
+`YYYY-DD-MM.gz` instead. You can add any other commads to the script for
+further processing.
 
-The `warden_archiver.py` script should run constantly. It is recommended to run it
-via systemd using the attached unit file (assuming systemd-based system). 
+The `warden_archiver.py` script should run constantly. It is recommended to run
+it via systemd using the attached unit file (assuming systemd-based system). 
 
-**Note:** The example configuration and other auxiliary files assume the archive is
-located at `/data/warden_archive/` and the archive should be run by user `wardenarchiver`.
+**Note:** The example configuration and other auxiliary files assume the
+archive is located at `/data/warden_archive/` and the archive should be run by
+user `wardenarchiver`.
 
 ## Installation
 
@@ -69,7 +73,7 @@ systemctl daemon-reload
 systemctl enable warden-archiver-filer
 systemctl start warden-archiver-filer
 ```
-9. (optional) Set up cron to compress data periodically:
+9. (optional) Set up cron to process and compress data periodically:
 ```
 cp warden_archiver.cron /etc/cron.d/warden_archiver
 ```
