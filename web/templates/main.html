@@ -1,0 +1,32 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Warden archive</title>
+<style>
+table {
+  margin-top: 0.5em;
+  border: 1px solid black;
+  border-collapse: collapse;
+}
+td, th {
+  border: 1px solid black;
+  text-align: center;
+  padding: 0 0.25em;
+}
+</style>
+</head>
+
+<body>
+
+Number of alerts received from Warden in the last 14 days:
+
+<table>
+<tr><th>Date</th><th>Total alerts</th><th>Test alerts</th></tr>
+{% for date,cnt,cnt_test in data %}
+<tr><td>{{date}}</td><td>{{cnt}}</td><td>{{cnt_test}}{% if cnt and cnt_test %} ({{ (cnt_test/cnt*100)|round(0)|int }}%){% endif %}</td></tr>
+{% endfor %}
+</table>
+
+</body>
+</html>
