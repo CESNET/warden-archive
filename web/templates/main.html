@@ -15,6 +15,7 @@ td, th {
   padding: 0 0.25em;
 }
 </style>
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 </head>
 
 <body>
@@ -27,6 +28,34 @@ Number of alerts received from Warden in the last 14 days:
 <tr><td>{{date}}</td><td>{{cnt}}</td><td>{{cnt_test}}{% if cnt and cnt_test %} ({{ (cnt_test/cnt*100)|round(0)|int }}%){% endif %}</td></tr>
 {% endfor %}
 </table>
+
+<div id="plot" style="min-width: 20em; max-width: 50em; height: 20em;">
+</div>
+
+<script>
+var data = [
+    {
+        x: [{% for date,_,_ in data %}"{{date}}",{% endfor %}],
+        y: [{% for _,cnt,cnt_test in data %}{{ cnt - cnt_test }},{% endfor %}],
+        name: "Non-Test",
+        type: "bar",
+        marker: {color: "rgb(0,51,204)"}
+    },
+    {
+        x: [{% for date,_,_ in data %}"{{date}}",{% endfor %}],
+        y: [{% for _,_,cnt_test in data %}{{ cnt_test }},{% endfor %}],
+        name: "Test category",
+        type: "bar",
+        marker: {color: "rgb(173,194,255)"}
+    }
+]
+var layout = {
+    barmode: "stack",
+    title: {text: "Number of alerts in Warden"},
+}
+Plotly.newPlot("plot", data, layout);
+
+</script>
 
 </body>
 </html>
