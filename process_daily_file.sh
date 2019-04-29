@@ -18,6 +18,8 @@ then
   exit 1
 fi
 
+echo "== Processing $date ==" >&2
+
 if ! [ -f "$archive_dir/$date" ]
 then
   if [ -f "$archive_dir/$date.gz" ]
@@ -31,9 +33,16 @@ then
   fi
 fi
 
-# Compute statistics about number of alerts
 mkdir -p $stats_dir
+
+# Compute statistics about number of alerts
 <"$archive_dir/$date" tee >(grep -E '"Category": *\[[^]]*"Test"' | wc -l > $stats_dir/cnt-test-$date) | wc -l >$stats_dir/cnt-all-$date
+
+# Compute number of alerts per Node.Name combination
+<"$archive_dir/$date" jq -r '[.Node[].Name]|reverse|join(",")' | sort | uniq -c | sort -rn > $stats_dir/cnt-by-node-$date
+
+# Compute number of alerts per Category
+<"$archive_dir/$date" jq -r '.Category|join(",")' | sort | uniq -c | sort -rn > $stats_dir/cnt-by-cat-$date
 
 
 # At last, compress the file.
