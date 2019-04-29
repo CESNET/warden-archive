@@ -36,14 +36,14 @@ Number of alerts received from Warden in the last 14 days:
 var data = [
     {
         x: [{% for date,_,_ in data %}"{{date}}",{% endfor %}],
-        y: [{% for _,cnt,cnt_test in data %}{{ cnt - cnt_test }},{% endfor %}],
+        y: [{% for _,cnt,cnt_test in data %}{{ (cnt or 0) - (cnt_test or 0) }},{% endfor %}],
         name: "Non-Test",
         type: "bar",
         marker: {color: "rgb(0,51,204)"}
     },
     {
         x: [{% for date,_,_ in data %}"{{date}}",{% endfor %}],
-        y: [{% for _,_,cnt_test in data %}{{ cnt_test }},{% endfor %}],
+        y: [{% for _,_,cnt_test in data %}{{ cnt_test or 0 }},{% endfor %}],
         name: "Test category",
         type: "bar",
         marker: {color: "rgb(173,194,255)"}
