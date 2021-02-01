@@ -20,7 +20,12 @@ td, th {
 
 <body>
 
-Number of alerts received from Warden in the last 14 days:
+<form>
+Number of alerts received from Warden in the last <input type="text" name="days" value="{{n_days}}" size="2"> days:
+</form>
+
+<div id="plot" style="width: 60em; height: 20em; float: right">
+</div>
 
 <table>
 <tr><th>Date</th><th>Total alerts</th><th>Test alerts</th></tr>
@@ -28,9 +33,6 @@ Number of alerts received from Warden in the last 14 days:
 <tr><td>{{date}}</td><td>{{cnt}}</td><td>{{cnt_test}}{% if cnt and cnt_test %} ({{ (cnt_test/cnt*100)|round(0)|int }}%){% endif %}</td></tr>
 {% endfor %}
 </table>
-
-<div id="plot" style="min-width: 20em; max-width: 50em; height: 20em;">
-</div>
 
 <script>
 var data = [
