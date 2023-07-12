@@ -38,10 +38,10 @@ chown -R wardenarchiver:all-users /data/warden_archive/
 
 3. Install warden_client Python library:
 ```
-wget https://homeproj.cesnet.cz/tar/warden/warden_client_3.0-beta2.tar.bz2
-tar -xjf warden_client_3.0-beta2.tar.bz2
-cp warden_client_3.0-beta2/warden_client.py /usr/lib/python3*/site-packages/
-rm -rf warden_client_3.0-beta2 warden_client_3.0-beta2.tar.bz2
+wget https://homeproj.cesnet.cz/tar/warden/warden_client_3.0-beta3.tar.bz2
+tar -xjf warden_client_3.0-beta3.tar.bz2
+cp warden_client_3.0-beta3/warden_client.py /usr/lib/python3*/site-packages/
+rm -rf warden_client_3.0-beta3 warden_client_3.0-beta3.tar.bz2
 
 # (Or rather use the latest version from git repository, if possible)
 ```

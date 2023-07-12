@@ -25,7 +25,7 @@ else:
 
 
 
-VERSION = "3.0-beta2"
+VERSION = "3.0-beta3"
 
 DEFAULT_CA_STORES = [
     "/etc/ssl/certs/ca-certificates.crt",       # Deb
@@ -42,9 +42,9 @@ class HTTPSConnection(httplib.HTTPSConnection):
     Used only if ssl.SSLContext is not available (Python version < 2.7.9)
     '''
     def __init__(self, host, **kwargs):
-        self.ciphers = kwargs.pop('ciphers',None)
-        self.ca_certs = kwargs.pop('ca_certs',None)
-        self.ssl_version = kwargs.pop('ssl_version',ssl.PROTOCOL_SSLv23)
+        self.ciphers = kwargs.pop('ciphers', None)
+        self.ca_certs = kwargs.pop('ca_certs', None)
+        self.ssl_version = kwargs.pop('ssl_version', getattr(ssl, "PROTOCOL_TLS", ssl.PROTOCOL_SSLv23))
 
         httplib.HTTPSConnection.__init__(self,host,**kwargs)
 
@@ -269,8 +269,8 @@ class Client(object):
         self.retry = int(retry)
         self.pause = int(pause)
 
-        self.ciphers = 'TLS_RSA_WITH_AES_256_CBC_SHA'
-        self.sslversion = ssl.PROTOCOL_TLSv1
+        self.ciphers = None
+        self.sslversion = getattr(ssl, "PROTOCOL_TLS", ssl.PROTOCOL_SSLv23)
 
         # If Python is new enough to have SSLContext, use it for SSL settings,
         # otherwise our own class derived from httplib.HTTPSConnection is used
