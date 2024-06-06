@@ -1,62 +1,185 @@
 <!doctype html>
 <html>
 <head>
-<meta charset="utf-8">
-<title>Warden archive</title>
-<style>
-table {
-  margin-top: 0.5em;
-  border: 1px solid black;
-  border-collapse: collapse;
-}
-td, th {
-  border: 1px solid black;
-  text-align: center;
-  padding: 0 0.25em;
-}
-</style>
-<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <meta charset="utf-8">
+    <title>Warden archive</title>
+    <style>
+        table {
+        margin-left: 4em;
+        margin-top: 0.5em;
+        border: 2px solid black;
+        border-collapse: collapse;
+        }
+        td, th {
+        border: 2px solid black;
+        text-align: center;
+        padding: 0.3em;
+        }
+        h1 {
+            text-align: center;
+        }
+        #form1, #form2 {
+            margin-left: 4em;
+            margin-top : 2em;
+        }
+        #bar-plot {
+            width: 60%;
+            height: 60%;
+            float: right;
+        }
+        #pie-plot {
+            width: 60%;
+            height: 60%;
+            float: right;
+            clear: both;
+            margin-top: 5em;
+        }
+        
+    </style>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 </head>
 
 <body>
 
-<form>
-Number of alerts received from Warden in the last <input type="text" name="days" value="{{n_days}}" size="2"> days:
+<h1>
+    Warden Archive
+</h1>
+
+<form id="form1">
+    Number of alerts received from Warden in the last <input type="text" name="days" value="{{n_days}}" size="2"> days:
 </form>
 
-<div id="plot" style="width: 60em; height: 20em; float: right">
-</div>
+
+<div id="bar-plot"></div>
+<div id="pie-plot"></div>
 
 <table>
-<tr><th>Date</th><th>Total alerts</th><th>Test alerts</th></tr>
-{% for date,cnt,cnt_test in data %}
-<tr><td>{{date}}</td><td>{{cnt}}</td><td>{{cnt_test}}{% if cnt and cnt_test %} ({{ (cnt_test/cnt*100)|round(0)|int }}%){% endif %}</td></tr>
-{% endfor %}
+    <tr><th>Date</th><th>Total alerts</th><th>Test alerts</th></tr>
+    {% for date,cnt,cnt_test in data %}
+    <tr><td>{{date}}</td><td>{{cnt}}</td><td>{{cnt_test}}{% if cnt and cnt_test %} ({{ (cnt_test/cnt*100)|round(0)|int }}%){% endif %}</td></tr>
+    {% endfor %}
+</table>
+
+<form method="post" id="form2">
+    <br>
+    <label for="selected_key">Select date:</label>
+    <select name="selected_key" id="selected_key">
+        {% for key in cat_data.keys() %}
+        <option value="{{ key }}" {% if key == selected_key %}selected{% endif %}>{{ key }}</option>
+        {% endfor %}
+    </select>
+</form>
+    
+<table id="key_table">
+    <thead>
+        <tr><th>Alert name</th><th>Count</th></tr>
+    </thead>
+    <tbody>
+        {% for data in cat_data[selected_key] %}
+        <tr><td>{{data[0]}}</td><td>{{data[1]}}</td></tr>
+        {% endfor %}
+    </tbody> 
 </table>
 
 <script>
-var data = [
-    {
-        x: [{% for date,_,_ in data %}"{{date}}",{% endfor %}],
-        y: [{% for _,cnt,cnt_test in data %}{{ (cnt or 0) - (cnt_test or 0) }},{% endfor %}],
-        name: "Non-Test",
-        type: "bar",
-        marker: {color: "rgb(0,51,204)"}
-    },
-    {
-        x: [{% for date,_,_ in data %}"{{date}}",{% endfor %}],
-        y: [{% for _,_,cnt_test in data %}{{ cnt_test or 0 }},{% endfor %}],
-        name: "Test category",
-        type: "bar",
-        marker: {color: "rgb(173,194,255)"}
+    // Updating selected_key and the table
+    document.getElementById('selected_key').addEventListener('change', function() {
+        var selectedKey = this.value;
+        updateTable(selectedKey);
+        updatePieChart();
+    });
+    
+    function updateTable(selectedKey) {
+        var table = document.getElementById('key_table');
+        var tbody = table.getElementsByTagName('tbody')[0];
+        tbody.innerHTML = ''; // Clear existing table rows
+        
+        var newData = cat_data[selectedKey];
+        newData.forEach(function(data) {
+            var row = tbody.insertRow();
+            var cell1 = row.insertCell(0);
+            var cell2 = row.insertCell(1);
+            cell1.textContent = data[0];
+            cell2.textContent = data[1];
+        });
     }
-]
-var layout = {
-    barmode: "stack",
-    title: {text: "Number of alerts in Warden"},
-}
-Plotly.newPlot("plot", data, layout);
 
+    function getSelectedKey(){
+        return document.getElementById('selected_key').value;
+    }
+
+    function updatePieChart() {
+        var key = getSelectedKey();
+        var current_data = cat_data[key];
+
+        // Sorting based on values
+        current_data.sort((a, b) => b[1] - a[1]);
+        var totalSum = current_data.reduce((acc, curr) => acc + curr[1], 0);
+
+        var labels = [];
+        var values = [];
+
+        // Merging low percent alerts into 'others'
+        var otherSum = 0;
+        current_data.forEach(item => {
+            var percentage = (item[1] / totalSum) * 100;
+            if (percentage > 1) {
+                labels.push(item[0]);
+                values.push(item[1]);
+            } else {
+                otherSum += item[1];
+            }
+        });
+
+        if (otherSum > 0) {
+            labels.push('Other');
+            values.push(otherSum);
+        }
+
+        data = [
+            {
+                labels: labels,
+                values: values,
+                type: "pie",
+                marker: {
+                    colors: ["rgb(0,51,204)", "rgb(173,194,255)", "rgb(0,153,51)", "rgb(255,102,102)"]
+                }
+            }
+        ];
+
+        layout = {
+            title: {text: "Distribution of Alerts in Warden (" + key + ")"},
+        }
+
+        Plotly.newPlot("pie-plot", data, layout);
+    }
+
+    // Bar plot
+    var data = [
+        {
+            x: [{% for date,_,_ in data %}"{{date}}",{% endfor %}],
+            y: [{% for _,cnt,cnt_test in data %}{{ (cnt or 0) - (cnt_test or 0) }},{% endfor %}],
+            name: "Non-Test",
+            type: "bar",
+            marker: {color: "rgb(0,51,204)"}
+        },
+        {
+            x: [{% for date,_,_ in data %}"{{date}}",{% endfor %}],
+            y: [{% for _,_,cnt_test in data %}{{ cnt_test or 0 }},{% endfor %}],
+            name: "Test category",
+            type: "bar",
+            marker: {color: "rgb(173,194,255)"}
+        }
+    ]
+    var layout = {
+        barmode: "stack",
+        title: {text: "Number of alerts in Warden"},
+    }
+    Plotly.newPlot("bar-plot", data, layout);
+
+    // Pie plot
+    var cat_data = {{cat_data|safe}};
+    updatePieChart();
 </script>
 
 </body>
