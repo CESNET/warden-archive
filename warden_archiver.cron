@@ -1,3 +1,5 @@
+#MAILTO=user@example.com
+
 # gzip old data in the warden archive every night (at 00:10)
-# TODO: maybe call directly by archiver?
-10 0 * * * wardenarchiver /data/warden_archive/process_daily_file.sh $(date -Idate -d "yesterday 12:00") >>/data/warden_archive/processing.log 2>&1
+# log output into file, copy any "ERROR" lines to stdout so cron will send an alert email
+10 0 * * * wardenarchiver /data/warden_archive/process_daily_file.sh $(date -Idate -d "yesterday 12:00") 2>&1 | tee -a /data/warden_archive/processing.log | grep '^ERROR'
