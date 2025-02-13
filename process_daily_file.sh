@@ -4,8 +4,7 @@
 # This contains a set of oprations that should be done at the end of each day,
 # when the daily file is complete.
 #
-# Takes one parameter - path/name of the finished file, which should look like
-# /path/YYYY-MM-DD
+# Takes one parameter - date of the file in format: YYYY-MM-DD
 
 prefix=/data/warden_archive
 archive_dir=$prefix/archive

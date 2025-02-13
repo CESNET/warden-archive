@@ -3,3 +3,6 @@
 # gzip old data in the warden archive every night (at 00:10)
 # log output into file, copy any "ERROR" lines to stdout so cron will send an alert email
 10 0 * * * wardenarchiver /data/warden_archive/process_daily_file.sh $(date -Idate -d "yesterday 12:00") 2>&1 | tee -a /data/warden_archive/processing.log | grep '^ERROR'
+
+# Copy files to long-term storage and remove the old ones from local archive
+#0 1 * * * wardenarchiver /data/warden_archive/copy_to_storage.sh >>/data/warden_archive/s3-storage.log 2>&1

@@ -9,11 +9,17 @@ of the current day (which is still being filled) is named `YYYY-DD-MM.current`
 and is renamed as soon as new file is to be created (i.e. just after midnight).
 
 If the attached cron script is used, each finished file is automatically
-processed by process_daily_file.sh script. By default, this script counts
+processed by `process_daily_file.sh` script. By default, this script counts
 number of alerts received in the day and then compress the file using gzip.
 Thereore, in such setting, the `archive` directory contains gzipped files named
 `YYYY-DD-MM.gz` instead. You can add any other commads to the script for
 further processing.
+
+It is also possible to copy the finished `.gz` files to an S3 bucket by using 
+the `copy_to_storage.sh` script. By default, every night it copies the latest
+file to the external storage and removes files older than a week from the local
+storage. Before any file is deleted, the script checks it is safely stored in
+the bucket. If not, it doesn't delete anything and send a notification email.
 
 The `warden_archiver.py` script should run constantly. It is recommended to run
 it via systemd using the attached unit file (assuming systemd-based system). 
@@ -82,3 +88,8 @@ cp warden_archiver.cron /etc/cron.d/warden_archiver
 ```
 cp warden_archiver.logrotate /etc/logrotate.d/warden_archiver
 ```
+
+11. (optional) Set up moving archive files to an external S3 storage:
+  - Install `s3cmd` (e.g. `yum install s3cmd`)
+  - Set up your S3 configuration in `s3cfg` file and check parameters at the beginning of `copy_to_storage.sh`.
+  - Enable call of `copy_to_storage.sh` in the cron file (`/etc/cron.d/warden_archiver`)

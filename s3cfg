@@ -1,0 +1,6 @@
+[default]
+host_base = https://CHANGE_ME
+use_https = True
+access_key = CHANGE_ME
+secret_key = CHANGE_ME
+host_bucket = CHANGE_ME
